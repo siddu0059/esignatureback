@@ -1,0 +1,42 @@
+{
+    "name": "esignature/esignature-sdk",
+    "homepage": "http://dev.infanion.com/esignaturesdkforphp",
+    "description": "Esignature SDK for PHP - Use Connective Esignature Web Services in your PHP project",
+    "keywords": ["connective", "E-signature"],
+    "type": "library",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "Connective esignature Web Services",
+            "homepage": "http://dev.infanion.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.0",
+        "guzzlehttp/guzzle": "^5.3.1|^6.2.1",
+        "guzzlehttp/psr7": "^1.4.1",
+        "guzzlehttp/promises": "~1.0",
+        "mtdowling/jmespath.php": "~2.2",
+        "ext-json": "*",
+        "ext-simplexml": "*"
+    },
+    "require-dev": {
+        "ext-openssl": "*",
+        "ext-dom": "*",
+        "phpunit/phpunit": "^4.8.35|^5.4.3",
+        "doctrine/cache": "~1.4",
+        "psr/cache": "^1.0"
+    },
+    "suggest": {
+        "ext-openssl": "Allows working with CloudFront private distributions and verifying received SNS messages",
+        "ext-curl": "To send requests using cURL"
+    },
+    "autoload": {
+        "psr-4": {
+            "Esignature\\": "src/"
+        },
+        "classmap": [
+            "src"
+        ]
+    }
+}
