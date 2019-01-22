@@ -13,13 +13,32 @@ class CreateSigningType implements ICreateSigningType {
         $this->MandatedSignerValidation = $MandatedSignerValidation;
     }
     public function SigningType() {
-        $SigningType = [
-            "SigningType"=>$this->SigningType,
+        $SigningType1 = [
+            "SigningType"=>'manual',
             "CommitmentTypes"=>[],
             "MandatedSignerValidation"=>$this->MandatedSignerValidation,
             "MandatedSignerIds"=>[],
         ];
-        return $SigningType;
+        $SigningType2 = [
+            "SigningType"=>'mailotp',
+            "CommitmentTypes"=>[],
+            "MandatedSignerValidation"=>$this->MandatedSignerValidation,
+            "MandatedSignerIds"=>[],
+        ];
+        $SigningType3 = [
+            "SigningType"=>"smsotp",
+            "CommitmentTypes"=>[],
+            "MandatedSignerValidation"=>$this->MandatedSignerValidation,
+            "MandatedSignerIds"=>[],
+        ];
+        $SigningType4 = [
+            "SigningType"=>"beid",
+            "CommitmentTypes"=>[],
+            "MandatedSignerValidation"=>$this->MandatedSignerValidation,
+            "MandatedSignerIds"=>[],
+        ];
+        $SigningTypes = [$SigningType1,$SigningType2,$SigningType3,$SigningType4];
+        return $SigningTypes;
     }
 }
 ?>

@@ -1,82 +1,73 @@
 <?php
 namespace Esignature;
+
+use Illuminate\Support\Facades\DB;
+use Auth;
 class ValidateEsignaturePackage {
-    public function ValidateSigningFields($Width,$Height,$Left,$Top) {
-        if($Top == null) {
-            throw new Exception("Top cannot be empty");
-        }
-        else if($Left == null) {
-            throw new Exception ("LastLeftName cannot be empty");
-        }
-        else if($Height == null) {
-            throw new Exception ("Height cannot be empty");
-        } 
-        else if($Width == null) {
-            throw new Exception ("Width cannot be empty");
-        }
-        else {
-            return true;
-        }
-    }
-    public function ValidateSigningType($SigningType) {
-        if($SigningType == null) {
-            throw new Exception ("SigningType cannot be empty");
-        }
-    }
-    public function ValidateActor($Type,$PhoneNumber,$SigningType) {
-        if($Type == null) {
-            throw new Exception ("Type cannot be empty");
-        }
-        else {
-            if($SigningType == 'smsotp') {
-                if($PhoneNumber == null) {
-                    throw new Exception ("PhoneNumber cannot be empty");
+    public function proceedSignature($cid,$userrole) {
+        $esignature_info = DB::table('esignature_actor')->select('action_url','actor_status','actor_role','user_email','package_id','document_id')->where('contract_id',$cid)->orderBy('actor_role', 'DESC')->get()->toarray();
+        $createCurlRequestObject = new CreateCurlRequest();
+        $message = "";
+        $download_url = "/testPdf/$cid";
+        $action_url ="";
+        if($userrole == 'tenant') {
+            $sign_show = "true";
+            if($esignature_info) {
+                if($esignature_info[0]->actor_status == "Available") {
+                    $sign_disable = "false";
+                    $statusurl = env('ESIGNATURE')."packages/".$esignature_info[0]->package_id."/status";
+                    $packagedata = $createCurlRequestObject->curlRequest($statusurl,env('ESIGNATURE_PASS'),"GET",null);
+                    if(explode(",",$packagedata['response']['Stakeholders'][0]['ExternalStakeholderReference'])[0]=='tenant') {
+                        $action_url = $packagedata['response']['Stakeholders'][0]['Actors'][0]['ActionUrl'];
+                    }
+                    else {
+                        $action_url = $packagedata['response']['Stakeholders'][1]['Actors'][0]['ActionUrl'];
+                    }
                 }
                 else {
-                    return true;
+                    $sign_disable = "true";
+                    $message = "You already signed this contract";
+                    if($esignature_info[0] ->actor_status != "Available") {
+                        $download_url = "/download-signed-document/".$esignature_info[0]->package_id."/".$esignature_info[0]->document_id."/".$cid;
+                    }
                 }
             }
             else {
-                return true;
+                $sign_disable = "false";
+                $action_url = "/sign-contract/$cid";
             }
-        } 
-    }
-    public function ValidateStakeholder($FirstName,$LastName,$Language,$EmailAddress) {
-        if($FirstName == null) {
-            throw new Exception ("FirstName cannot be empty");
-        }
-        else if($LastName == null) {
-            throw new Exception ("LastName cannot be empty");
-        }
-        else if($EmailAddress == null) {
-            throw new Exception ("EmailAddress cannot be empty");
-        }
-        else  {
-            if($Language == null) {
-                $Language = "en";
-            }
-            return true;
-        }
-    }
-    public function ValidatePackage ($DocumentPath,$Initiator,$DocumentLanguage,$DocumentName,$ExpiryTimestamp) {
-        if($DocumentPath == null) {
-            throw new Exception ("DocumentPath cannot be empty");
-        }
-        else if($ExpiryTimestamp == null) {
-            throw new Exception ("ExpiryTimestamp cannot be empty");
-        }
-        else if($DocumentName == null) {
-            throw new Exception ("DocumentName cannot be empty");
-        }
-        else if($Initiator == null) {
-            throw new Exception ("Initiator cannot be empty");
         }
         else {
-            if($DocumentLanguage == null) {
-                $DocumentLanguage == "en";
+            $sign_show = "false";
+            if($esignature_info) {               
+                if($esignature_info[0] ->actor_status != "Available") {
+                    if($esignature_info[1] ->actor_status == "Available"){
+                        $statusurl = env('ESIGNATURE')."packages/".$esignature_info[0]->package_id."/status";
+                        $packagedata = $createCurlRequestObject->curlRequest($statusurl,env('ESIGNATURE_PASS'),"GET",null);
+                        $sign_disable = "false";
+                        if(explode(",",$packagedata['response']['Stakeholders'][0]['ExternalStakeholderReference'])!='tenant') {
+                            $action_url = $packagedata['response']['Stakeholders'][0]['Actors'][0]['ActionUrl'];
+                        }
+                        else {
+                            $action_url = $packagedata['response']['Stakeholders'][1]['Actors'][0]['ActionUrl'];
+                        } 
+                    }
+                    else {
+                        $sign_disable = "true";
+                        $message = "You already signed this contract";
+                        $download_url = "/download-signed-document/".$esignature_info[0]->package_id."/".$esignature_info[0]->document_id."/".$cid;
+                    }
+                }
+                else {
+                    $sign_disable = "true";
+                    $message = "tenant did'nt signed to this contract yet";
+                }
             }
-            return true;
+            else {
+                $sign_disable = "true";
+            }
         }
+        return [$sign_disable,$action_url,$message,$sign_show,$download_url];
     }
 }
 ?>
