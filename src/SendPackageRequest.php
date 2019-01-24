@@ -26,12 +26,12 @@
     }
 
     public function createObjects() {
-      $TenantPhoneNumber = $this->UsersInfo['credentials']['tenantDetails'][0]['phcode'].$this->UsersInfo['credentials']['tenantDetails'][0]['phno'];
+      $TenantPhoneNumber = '+' . $this->UsersInfo['credentials']['tenantDetails'][0]['phcode'].$this->UsersInfo['credentials']['tenantDetails'][0]['phno'];
       $TenantType = "Signer";
       $TenantOrderIndex = 0;
       $TenantLegalNoticeCode = "";
       $TenantLegalNoticeText = "";
-      $TenantRedirectUrl = "http://daredevil.local/upadte-sigining-status/$this->cid";
+      $TenantRedirectUrl = $OwnerRedirectUrl = env('APP_URL') . "/upadte-sigining-status/$this->cid";
       $TenantSendNotifications = true;
       $TenantFirstName = $this->UsersInfo['credentials']['tenantDetails'][0]['first_name'];
       $TenantLastName = $this->UsersInfo['credentials']['tenantDetails'][0]['last_name'];
@@ -41,12 +41,11 @@
       $TenantExternalStakeholderReference = "tenant,".$TenantEmailAddress;
       $TenantSigningType = "manual";
 
-      $OwnerPhoneNumber = "+91826616254";//$this->UsersInfo['credentials']['ownerDetails'][0]['phcode'].$this->UsersInfo['credentials']['tenantDetails'][0]['phno'];
+      $OwnerPhoneNumber = '+' . $this->UsersInfo['credentials']['ownerDetails'][0]['phcode'].$this->UsersInfo['credentials']['tenantDetails'][0]['phno'];
       $OwnerType = "Signer";
       $OwnerOrderIndex = 1;
       $OwnerLegalNoticeCode = "";
       $OwnerLegalNoticeText = "";
-      $OwnerRedirectUrl = "http://daredevil.local/upadte-sigining-status/$this->cid";
       $OwnerSendNotifications = true; 
       $OwnerFirstName = $this->UsersInfo['credentials']['ownerDetails'][0]['first_name'];
       $OwnerLastName = $this->UsersInfo['credentials']['ownerDetails'][0]['last_name'];
@@ -57,8 +56,8 @@
       $OwnerSigningType = "manual";
 
       $MandatedSignerValidation = "";
-      $Initiator = "nagasiddeswara.infanion@gmail.com";
-      $CallBackUrl = "https://b0bb505a.ngrok.io/signed-document";
+      $Initiator = env('EINITIATOR'); //"nagasiddeswara.infanion@gmail.com";
+      $CallBackUrl = env('APP_URL') . "/signed-document";
       $DocumentLanguage = Config::get('app.locale');
       $DocumentName = "contract";
       $NotificationCallBackUrl = "";
@@ -111,7 +110,7 @@
       $PackageObject = new CreatePackage($DocumentPath,$Initiator,$CallBackUrl,$DocumentLanguage,$DocumentName,$NotificationCallBackUrl,$DocumentGroupCode,$ExpiryTimestamp,$ExternalPackageReference,$ExternalPackageData,$F2FRedirectUrl,$ExternalDocumentReference,$StakeholderFirst,$StakeholderSecond,$TargetType,$PdfErrorHandling,$SigningTemplateCode,$CorrelationId);
       $Package = $PackageObject->Package();
       $JsonPakage = json_encode($Package);
-      $CreatePackageUrl = env('ESIGNATURE')."packages/instant";
+      $CreatePackageUrl = env('ESIGNATURE') . "packages/instant";
       $EsignaturePassword = env('ESIGNATURE_PASS');
       $CreatePackageMethod = "POST";
       $createCurlRequestObject = new CreateCurlRequest();
