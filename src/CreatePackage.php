@@ -5,7 +5,7 @@ interface ICreatePackage {
 }
 class CreatePackage implements ICreatePackage {
     private $DocumentPath,$Initiator,$CallBackUrl,$DocumentLanguage,$DocumentName,$NotificationCallBackUrl,$DocumentGroupCode,$ExpiryTimestamp,$ExternalPackageReference,$ExternalPackageData,$F2FRedirectUrl,$ExternalDocumentReference,$Stakeholders,$TargetType,$PdfErrorHandling,$SigningTemplateCode,$CorrelationId;
-    public function __construct($DocumentPath,$Initiator,$CallBackUrl,$DocumentLanguage,$DocumentName,$NotificationCallBackUrl,$DocumentGroupCode,$ExpiryTimestamp,$ExternalPackageReference,$ExternalPackageData,$F2FRedirectUrl,$ExternalDocumentReference,$Stakeholders,$TargetType,$PdfErrorHandling,$SigningTemplateCode,$CorrelationId) {
+    public function __construct($DocumentPath,$Initiator,$CallBackUrl,$DocumentLanguage,$DocumentName,$NotificationCallBackUrl,$DocumentGroupCode,$ExpiryTimestamp,$ExternalPackageReference,$ExternalPackageData,$F2FRedirectUrl,$ExternalDocumentReference,$StakeholderFirst,$StakeholderSecond,$TargetType,$PdfErrorHandling,$SigningTemplateCode,$CorrelationId) {
         $this->DocumentPath = $DocumentPath;
         $this->Initiator = $Initiator;
         $this->CallBackUrl = $CallBackUrl;
@@ -18,7 +18,8 @@ class CreatePackage implements ICreatePackage {
         $this->ExternalPackageData = $ExternalPackageData;
         $this->F2FRedirectUrl = $F2FRedirectUrl;
         $this->ExternalDocumentReference = $ExternalDocumentReference;
-        $this->Stakeholders = $Stakeholders;
+        $this->StakeholderFirst = $StakeholderFirst;
+        $this->StakeholderSecond = $StakeholderSecond;
         $this->TargetType = $TargetType;
         $this->PdfErrorHandling = $PdfErrorHandling;
         $this->SigningTemplateCode = $SigningTemplateCode;
@@ -39,7 +40,7 @@ class CreatePackage implements ICreatePackage {
             "ExternalPackageData"=>$this->ExternalPackageData,
             "F2FRedirectUrl"=>$this->F2FRedirectUrl,
             "ExternalDocumentReference"=>$this->ExternalDocumentReference,
-            "Stakeholders"=>[$this->Stakeholders],
+            "Stakeholders"=>[$this->StakeholderFirst,$this->StakeholderSecond],
             "TargetType" =>$this->TargetType,
             "PdfErrorHandling" =>$this->PdfErrorHandling,
             "SigningTemplateCode" =>$this->SigningTemplateCode,
