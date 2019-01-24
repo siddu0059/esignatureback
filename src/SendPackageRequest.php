@@ -24,8 +24,9 @@
       $this->UsersInfo = $UsersInfo;
       $this->cid = $cid;
     }
+
     public function createObjects() {
-      $TenantPhoneNumber = "+918296616254";//$this->UsersInfo['credentials']['tenantDetails'][0]['phcode'].$this->UsersInfo['credentials']['tenantDetails'][0]['phno'];
+      $TenantPhoneNumber = '+' . $this->UsersInfo['credentials']['tenantDetails'][0]['phcode'].$this->UsersInfo['credentials']['tenantDetails'][0]['phno'];
       $TenantType = "Signer";
       $TenantOrderIndex = 0;
       $TenantLegalNoticeCode = "";
@@ -40,7 +41,7 @@
       $TenantExternalStakeholderReference = "tenant,".$TenantEmailAddress;
       $TenantSigningType = "manual";
 
-      $OwnerPhoneNumber = "+918296616254";//$this->UsersInfo['credentials']['ownerDetails'][0]['phcode'].$this->UsersInfo['credentials']['tenantDetails'][0]['phno'];
+      $OwnerPhoneNumber = '+' . $this->UsersInfo['credentials']['ownerDetails'][0]['phcode'].$this->UsersInfo['credentials']['tenantDetails'][0]['phno'];
       $OwnerType = "Signer";
       $OwnerOrderIndex = 1;
       $OwnerLegalNoticeCode = "";
@@ -56,8 +57,8 @@
       $OwnerSigningType = "manual";
 
       $MandatedSignerValidation = "";
-      $Initiator = "nagasiddeswara.infanion@gmail.com";
-      $CallBackUrl = "https://b0bb505a.ngrok.io/signed-document";
+      $Initiator = env('EINITIATOR'); //"nagasiddeswara.infanion@gmail.com";
+      $CallBackUrl = env('APP_URL') . "/signed-document";
       $DocumentLanguage = Config::get('app.locale');
       $DocumentName = "contract";
       $NotificationCallBackUrl = "";
