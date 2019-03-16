@@ -26,7 +26,7 @@
     }
 
     public function createObjects() {
-      $TenantPhoneNumber = '+' . $this->UsersInfo['credentials']['tenantDetails'][0]['phcode'].$this->UsersInfo['credentials']['tenantDetails'][0]['phno'];
+      $TenantPhoneNumber = '+918296616254';//'+' . $this->UsersInfo['credentials']['tenantDetails'][0]['phcode'].$this->UsersInfo['credentials']['tenantDetails'][0]['phno'];
       $TenantType = "Signer";
       $TenantOrderIndex = 0;
       $TenantLegalNoticeCode = "";
@@ -41,7 +41,7 @@
       $TenantExternalStakeholderReference = "tenant,".$TenantEmailAddress;
       $TenantSigningType = "manual";
 
-      $OwnerPhoneNumber = '+' . $this->UsersInfo['credentials']['ownerDetails'][0]['phcode'].$this->UsersInfo['credentials']['tenantDetails'][0]['phno'];
+      $OwnerPhoneNumber = '+918296616254';//'+' . $this->UsersInfo['credentials']['ownerDetails'][0]['phcode'].$this->UsersInfo['credentials']['tenantDetails'][0]['phno'];
       $OwnerType = "Signer";
       $OwnerOrderIndex = 1;
       $OwnerLegalNoticeCode = "";

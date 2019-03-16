@@ -8,37 +8,22 @@ interface ICreateSigningType {
 
 class CreateSigningType implements ICreateSigningType {
     private $SigningType,$MandatedSignerValidation;
-    public function __construct($SigningType,$MandatedSignerValidation) {
-        $this->SigningType = $SigningType;
+    public function __construct($SigningTypes,$CommitmentTypes,$MandatedSignerValidation,$MandatedSignerIds) {
+        $this->SigningTypes = $SigningTypes;
+        $this->CommitmentTypes = $CommitmentTypes;
         $this->MandatedSignerValidation = $MandatedSignerValidation;
+        $this->MandatedSignerIds = $MandatedSignerIds;
     }
     public function SigningType() {
-        $SigningType1 = [
-            "SigningType"=>'manual',
-            "CommitmentTypes"=>[],
-            "MandatedSignerValidation"=>$this->MandatedSignerValidation,
-            "MandatedSignerIds"=>[],
-        ];
-        $SigningType2 = [
-            "SigningType"=>'mailotp',
-            "CommitmentTypes"=>[],
-            "MandatedSignerValidation"=>$this->MandatedSignerValidation,
-            "MandatedSignerIds"=>[],
-        ];
-        $SigningType3 = [
-            "SigningType"=>"smsotp",
-            "CommitmentTypes"=>[],
-            "MandatedSignerValidation"=>$this->MandatedSignerValidation,
-            "MandatedSignerIds"=>[],
-        ];
-        $SigningType4 = [
-            "SigningType"=>"beid",
-            "CommitmentTypes"=>[],
-            "MandatedSignerValidation"=>$this->MandatedSignerValidation,
-            "MandatedSignerIds"=>[],
-        ];
-        $SigningTypes = [$SigningType1,$SigningType2,$SigningType3,$SigningType4];
-        return $SigningTypes;
+        foreach ($this->SigningTypes as $key => $value) {
+            $SigningType[$key] = [
+                "SigningType"=>$value,
+                "CommitmentTypes"=>$this->CommitmentTypes,
+                "MandatedSignerValidation"=>$this->MandatedSignerValidation,
+                "MandatedSignerIds"=>$this->MandatedSignerIds,
+            ];
+        }
+        return $SigningType;
     }
 }
 ?>
