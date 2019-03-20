@@ -10,7 +10,7 @@ class CreatePackage implements ICreatePackage {
         $this->Stakeholders = $Stakeholders;
     }
     public function Package() {
-        $Document = base64_encode(file_get_contents($this->PackageInfo['DocumentPath']));
+        $Document = $this->PackageInfo['PdfData'];
         $Package = [
             "Document"=>$Document,
             "Initiator"=>$this->PackageInfo['Initiator'],
