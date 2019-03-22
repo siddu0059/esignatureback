@@ -8,7 +8,7 @@ class ValidateEsignaturePackage {
         if ($userrole == "tenant" || $userrole == "property owner") {
             $createCurlRequestObject = new CreateCurlRequest();
             $esignature_info = DB::table('esignature_actor as ea')->join('esignature_package as ep', 'ea.package_id', 'ep.package_id')->select('ea.actor_role', 'ea.actor_status', 'ep.package_id', 'ep.document_id', 'ep.download_url', 'ep.contract_id', 'ep.package_status')->where('ea.actor_mail', $useremail)->where('ep.contract_id', $cid)->get()->toarray();
-            $contarct_status = DB::table('contracts')->where('unique_key',$cid)->select('status')->get()->toarray();
+            $contarct_status = DB::table('contracts as c')->join('status as s','s.id','=','c.status')->where('unique_key',$cid)->select('c.status','s.name')->get()->toarray();
             $sign_disable = "";
             $action_url = "";
             $download_url = "/download/unsigned-document/".$cid;
@@ -16,32 +16,19 @@ class ValidateEsignaturePackage {
             $esignature_message = "";
             $signed = "";
             $pending = "";
+            $packagestatus = "Pending";
             
-            if($contarct_status[0]->status == 2 && $userrole == 'property owner') {
-                $sign_disable = "";
-                $action_url = "";
-                $download_url = "/download/unsigned-document/".$cid;
-                $sign_show = "";
-                $esignature_message = "";
-                return [$sign_disable,$action_url,$download_url,$esignature_message,$sign_show,$signed,$pending];
-            }
-            if($contarct_status[0]->status == 10) {
-                $sign_disable = "";
-                $action_url = "";
-                $download_url = "/download/unsigned-document/".$cid;
-                $sign_show = "";
-                $esignature_message = "";
-                return [$sign_disable,$action_url,$download_url,$esignature_message,$sign_show,$signed,$pending];
-            }
-            if($contarct_status[0]->status == 3 && $userrole == 'property owner') {
+            if($contarct_status[0]->status <=6 || $contarct_status[0]->status == 8) {
                 $sign_disable = "true";
-                $action_url = "";
                 $download_url = "/download/unsigned-document/".$cid;
-                $sign_show = "false";
-                $esignature_message = "Pending approval from tenant";
+                $action_url = "";
+                $esignature_message = "";
+                $signed = "";
+                $pending = "";
                 return [$sign_disable,$action_url,$download_url,$esignature_message,$sign_show,$signed,$pending];
             }
             if (empty($esignature_info)) {
+                $actorstatus = "Available";
                 $sign_disable = "false";
                 $action_url = "/sign-contract/$cid";
                 $esignature_message = "Signature is pending from all the parties";
@@ -50,12 +37,16 @@ class ValidateEsignaturePackage {
                 }
             } 
             else {
+                $actorstatus = $esignature_info[0]->actor_status;
+                $actorstatus = $esignature_info[0]->actor_status;
                 $signed_users = DB::table('esignature_actor as ea')->join('esignature_package as ep', 'ea.package_id', 'ep.package_id')->select('ea.fname')->where('ea.actor_status', "SIGNED")->where('ep.contract_id', $cid)->get()->toarray();
-                $pending_users = DB::table('esignature_actor as ea')->join('esignature_package as ep', 'ea.package_id', 'ep.package_id')->select('ea.fname')->where('ea.actor_status', "Available")->where('ep.contract_id', $cid)->get()->toarray();
-                
+                $pending_users = DB::table('esignature_actor as ea')->join('esignature_package as ep', 'ea.package_id', 'ep.package_id')->select('ea.fname')->where('ea.actor_status', "Available")->where('ep.contract_id', $cid)->get()->toarray();                
                 if ($esignature_info[0]->actor_status == "Available") {
                     $statusurl = env('ESIGNATURE')."packages/".$esignature_info[0]->package_id."/status";
                     $packagedata = $createCurlRequestObject->curlRequest($statusurl, env('ESIGNATURE_PASS'), "GET", null);
+                    // $statusurl = env('ESIGNATURE')."packages/".$esignature_info[0]->package_id."/status";
+                    // $packagedata = $creat$contarct_status[0]->status
+                    // CurlRequestObject->curlRequest($statusurl, env('ESIGNATURE_PASS'), "GET", null);
                     foreach ($packagedata['response']['Stakeholders'] as $key => $value) {
                         $externalReference = explode(",", $value['ExternalStakeholderReference']);
                         if ($externalReference[1] == $useremail && $externalReference[2] == $cid) {
@@ -90,6 +81,7 @@ class ValidateEsignaturePackage {
                         $download_url = "/download/signed-document/".$esignature_info[0]->package_id."/".$esignature_info[0]->document_id."/".$cid;
                         $esignature_message = "Signed By all the parties";
                         $sign_show = "false";
+                        $packagestatus = "Finished";
                     } else {
                         $sign_disable = "true";
                         $download_url = "/download/unsigned-document/".$cid;
@@ -123,6 +115,7 @@ class ValidateEsignaturePackage {
                 $download_url = "download/unsigned-document/".$cid;
                 $esignature_message = "Signature is Pending from all the parties";
                 $sign_show = "false";
+                $packagestatus = "Finished";
             }
             else {
                 $signed_users = DB::table('esignature_actor as ea')->join('esignature_package as ep', 'ea.package_id', 'ep.package_id')->select('ea.fname')->where('ea.actor_status', "Available")->where('ep.contract_id', $cid)->get()->toarray();
@@ -148,7 +141,8 @@ class ValidateEsignaturePackage {
             }
             
         }
-        return [$sign_disable,$action_url,$download_url,$esignature_message,$sign_show,$signed,$pending];
+        //print_r([$sign_disable,$action_url,$download_url,$esignature_message,$sign_show,$signed,$pending,$actorstatus,$packagestatus]);exit;
+        return [$sign_disable,$action_url,$download_url,$esignature_message,$sign_show,$signed,$pending,$actorstatus,$packagestatus];
     }
 }
 ?>
