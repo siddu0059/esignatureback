@@ -40,7 +40,11 @@ class ValidateEsignaturePackage {
                 $actorstatus = $esignature_info[0]->actor_status;
                 $actorstatus = $esignature_info[0]->actor_status;
                 $signed_users = DB::table('esignature_actor as ea')->join('esignature_package as ep', 'ea.package_id', 'ep.package_id')->select('ea.fname')->where('ea.actor_status', "SIGNED")->where('ep.contract_id', $cid)->get()->toarray();
+<<<<<<< HEAD
                 $pending_users = DB::table('esignature_actor as ea')->join('esignature_package as ep', 'ea.package_id', 'ep.package_id')->select('ea.fname')->where('ea.actor_status', "Available")->where('ep.contract_id', $cid)->get()->toarray();                
+=======
+                $pending_users = DB::table('esignature_actor as ea')->join('esignature_package as ep', 'ea.package_id', 'ep.package_id')->select('ea.fname')->where('ea.actor_status', "Available")->where('ep.contract_id', $cid)->get()->toarray();
+>>>>>>> 7011a9e5d1bbfb0ec40ddbc5942c0c0e14fb45d2
                 if ($esignature_info[0]->actor_status == "Available") {
                     $statusurl = env('ESIGNATURE')."packages/".$esignature_info[0]->package_id."/status";
                     $packagedata = $createCurlRequestObject->curlRequest($statusurl, env('ESIGNATURE_PASS'), "GET", null);
