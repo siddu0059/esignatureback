@@ -79,6 +79,19 @@ class ValidateEsignaturePackage {
                     }
                 }
                 else {
+                    if (isset($userid) && $userid != '') {
+                        $statusurl = env('ESIGNATURE')."packages/".$esignature_info[0]->package_id."/status";
+                        $packagedata = $createCurlRequestObject->curlRequest($statusurl, env('ESIGNATURE_PASS'), "GET", null);
+                        foreach ($packagedata['response']['Stakeholders'] as $key => $value) {
+                            $externalReference = explode(",", $value['ExternalStakeholderReference']);
+                            if ($externalReference[1] == $useremail && $externalReference[2] == $cid) {
+                                $action_url = $value['Actors'][0]['ActionUrl'];
+                                if (isset($userid) && $userid != '') {
+                                    redirect()->to($action_url)->send();
+                                }
+                            }
+                        }
+                    }
                     if ($esignature_info[0]->package_status == "Finished") {
                         $sign_disable = "true";
                         $download_url = "/download/signed-document/".$esignature_info[0]->package_id."/".$esignature_info[0]->document_id."/".$cid;
