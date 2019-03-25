@@ -252,7 +252,7 @@ class ValidateEsignaturePackage {
                     }
                 }
             }
-            print_r([$sign_disable,$action_url,$download_url,$esignature_message,$sign_show,$signed,$pending,$actorstatus,$packagestatus]);exit;
+            return [$sign_disable,$action_url,$download_url,$esignature_message,$sign_show,$signed,$pending,$actorstatus,$packagestatus];
         }
         else {
             $esignature_info = DB::table('esignature_actor as ea')->join('esignature_package as ep', 'ea.package_id', 'ep.package_id')->select('ea.actor_role', 'ea.actor_status', 'ep.package_id', 'ep.document_id', 'ep.download_url', 'ep.contract_id', 'ep.package_status')->where('ea.actor_mail', $useremail)->where('ep.contract_id', $cid)->get()->toarray();
