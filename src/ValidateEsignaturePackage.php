@@ -41,11 +41,11 @@ class ValidateEsignaturePackage {
                 else {
                     $actorstatus = $esignature_info[0]->actor_status;
                     $actorstatus = $esignature_info[0]->actor_status;
-                    $signed_users = DB::table('esignature_actor as ea')->join('esignature_package as ep', 'ea.package_id', 'ep.package_id')->join('contracts as ct', 'ct.unique_key','ep.contract_id')->join('credentials as cd', 'cd.contarct_id','ct.id')->select('ea.fname')->where('ea.actor_status', "SIGNED")->where('ep.contract_id', $cid)->get()->toarray();
-                    $pending_users = DB::table('esignature_actor as ea')->join('esignature_package as ep', 'ea.package_id', 'ep.package_id')->join('contracts as ct', 'ct.unique_key','ep.contract_id')->join('credentials as cd', 'cd.contarct_id','ct.id')->select('ea.fname')->where('ea.actor_status', "Available")->where('ep.contract_id', $cid)->get()->toarray();
+                    //$signed_users = DB::table('esignature_actor as ea')->join('esignature_package as ep', 'ea.package_id', 'ep.package_id')->join('contracts as ct', 'ct.unique_key','ep.contract_id')->join('credentials as cd', 'cd.contarct_id','ct.id')->select('ea.fname')->where('ea.actor_status', "SIGNED")->where('ep.contract_id', $cid)->get()->toarray();
+                    //$pending_users = DB::table('esignature_actor as ea')->join('esignature_package as ep', 'ea.package_id', 'ep.package_id')->join('contracts as ct', 'ct.unique_key','ep.contract_id')->join('credentials as cd', 'cd.contarct_id','ct.id')->select('ea.fname')->where('ea.actor_status', "Available")->where('ep.contract_id', $cid)->get()->toarray();
                     
-                    //$signed_users = DB::table('esignature_actor as ea')->join('esignature_package as ep', 'ea.package_id', 'ep.package_id')->select('ea.fname')->where('ea.actor_status', "SIGNED")->where('ep.contract_id', $cid)->get()->toarray();
-                    // $pending_users = DB::table('esignature_actor as ea')->join('esignature_package as ep', 'ea.package_id', 'ep.package_id')->select('ea.fname')->where('ea.actor_status', "Available")->where('ep.contract_id', $cid)->get()->toarray();
+                    $signed_users = DB::table('esignature_actor as ea')->join('esignature_package as ep', 'ea.package_id', 'ep.package_id')->select('ea.fname')->where('ea.actor_status', "SIGNED")->where('ep.contract_id', $cid)->get()->toarray();
+                    $pending_users = DB::table('esignature_actor as ea')->join('esignature_package as ep', 'ea.package_id', 'ep.package_id')->select('ea.fname')->where('ea.actor_status', "Available")->where('ep.contract_id', $cid)->get()->toarray();
                     if ($esignature_info[0]->actor_status == "Available") {
                         $statusurl = env('ESIGNATURE')."packages/".$esignature_info[0]->package_id."/status";
                         $packagedata = $createCurlRequestObject->curlRequest($statusurl, env('ESIGNATURE_PASS'), "GET", null);
