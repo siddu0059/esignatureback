@@ -3,6 +3,7 @@ namespace Esignature;
 
 use Illuminate\Support\Facades\DB;
 use Auth;
+use Illuminate\Support\Arr;
 class ValidateEsignaturePackage {
     public function proceedSignature($cid,$userrole,$useremail,$userid = '') {
         if ($userrole == "tenant" || $userrole == "property owner") {
@@ -40,18 +41,32 @@ class ValidateEsignaturePackage {
                 } 
                 else {
                     $actorstatus = $esignature_info[0]->actor_status;
-                    $actorstatus = $esignature_info[0]->actor_status;
-                    //$signed_users = DB::table('esignature_actor as ea')->join('esignature_package as ep', 'ea.package_id', 'ep.package_id')->join('contracts as ct', 'ct.unique_key','ep.contract_id')->join('credentials as cd', 'cd.contarct_id','ct.id')->select('ea.fname')->where('ea.actor_status', "SIGNED")->where('ep.contract_id', $cid)->get()->toarray();
-                    //$pending_users = DB::table('esignature_actor as ea')->join('esignature_package as ep', 'ea.package_id', 'ep.package_id')->join('contracts as ct', 'ct.unique_key','ep.contract_id')->join('credentials as cd', 'cd.contarct_id','ct.id')->select('ea.fname')->where('ea.actor_status', "Available")->where('ep.contract_id', $cid)->get()->toarray();
-                    
-                    $signed_users = DB::table('esignature_actor as ea')->join('esignature_package as ep', 'ea.package_id', 'ep.package_id')->select('ea.fname')->where('ea.actor_status', "SIGNED")->where('ep.contract_id', $cid)->get()->toarray();
-                    $pending_users = DB::table('esignature_actor as ea')->join('esignature_package as ep', 'ea.package_id', 'ep.package_id')->select('ea.fname')->where('ea.actor_status', "Available")->where('ep.contract_id', $cid)->get()->toarray();
+                    $contract_id = DB::table('contracts')->where('unique_key', '=', $cid)->value('id');
+                    $result = DB::table('credentials as cd');
+                    $result->join('contracts as ct', 'ct.property_id', '=', 'cd.property_id');
+                    $result->select('cd.first_name', 'cd.last_name','cd.title',DB::raw('(select actor_status from esignature_actor where actor_mail = cd.email) as actor_status'));
+                    $result->where('cd.status', '=', '0');
+                    if ($cid != '') {
+                        $result->where('ct.unique_key', '=', $cid)
+                            ->where(function ($result) use ($contract_id) {
+                                $result->where('cd.contract_id', '=', $contract_id)
+                            ->orWhereNULL('cd.contract_id');
+                            });
+                    }
+                    $result = $result->get()->toArray();
+                    $i = 0;
+                    $j = 0;
+                    foreach ($result as $key => $value) {
+                        if($value->actor_status == "Available") {
+                            $pending_users[$i++] = $value;
+                        }
+                        else {
+                            $signed_users[$j++] = $value;
+                        }
+                    }
                     if ($esignature_info[0]->actor_status == "Available") {
                         $statusurl = env('ESIGNATURE')."packages/".$esignature_info[0]->package_id."/status";
                         $packagedata = $createCurlRequestObject->curlRequest($statusurl, env('ESIGNATURE_PASS'), "GET", null);
-                        // $statusurl = env('ESIGNATURE')."packages/".$esignature_info[0]->package_id."/status";
-                        // $packagedata = $creat$contarct_status[0]->status
-                        // CurlRequestObject->curlRequest($statusurl, env('ESIGNATURE_PASS'), "GET", null);
                         foreach ($packagedata['response']['Stakeholders'] as $key => $value) {
                             $externalReference = explode(",", $value['ExternalStakeholderReference']);
                             if ($externalReference[1] == $useremail && $externalReference[2] == $cid) {
@@ -65,13 +80,13 @@ class ValidateEsignaturePackage {
                                 }
                                 else {
                                     foreach ($signed_users as $key => $value) {
-                                        $signed = $signed.$value->fname;
+                                        $signed = $signed.$value->title.$value->first_name." ".$value->last_name;
                                         if($key < count($signed_users)-1) {
                                             $signed = $signed.", ";
                                         }
                                     }
                                     foreach ($pending_users as $key => $value) {
-                                        $pending = $pending.$value->fname;
+                                        $pending = $pending.$value->title.$value->first_name." ".$value->last_name;
                                         if($key < count($pending_users)-1) {
                                             $pending = $pending.", ";
                                         }
@@ -109,13 +124,13 @@ class ValidateEsignaturePackage {
                             }
                             else {
                                 foreach ($signed_users as $key => $value) {
-                                    $signed = $signed.$value->fname;
+                                    $signed = $signed.$value->title.$value->first_name." ".$value->last_name;
                                     if($key < count($signed_users)-1) {
                                         $signed = $signed.", ";
                                     }
                                 }
                                 foreach ($pending_users as $key => $value) {
-                                    $pending = $pending.$value->fname;
+                                    $pending = $pending.$value->title.$value->first_name." ".$value->last_name;
                                     if($key < count($pending_users)-1) {
                                         $pending = $pending.", ";
                                     }
@@ -123,7 +138,7 @@ class ValidateEsignaturePackage {
                             }
                         }
                     }
-                }
+                }                
                 return [$sign_disable,$action_url,$download_url,$esignature_message,$sign_show,$signed,$pending,$actorstatus,$packagestatus];
             }
             else {
@@ -138,15 +153,32 @@ class ValidateEsignaturePackage {
                 } 
                 else {
                     $actorstatus = $esignature_info[0]->actor_status;
-                    $actorstatus = $esignature_info[0]->actor_status;
-                    $signed_users = DB::table('esignature_actor as ea')->join('esignature_package as ep', 'ea.package_id', 'ep.package_id')->select('ea.fname')->where('ea.actor_status', "SIGNED")->where('ep.contract_id', $cid)->get()->toarray();
-                    $pending_users = DB::table('esignature_actor as ea')->join('esignature_package as ep', 'ea.package_id', 'ep.package_id')->select('ea.fname')->where('ea.actor_status', "Available")->where('ep.contract_id', $cid)->get()->toarray();
+                    $contract_id = DB::table('contracts')->where('unique_key', '=', $cid)->value('id');
+                    $result = DB::table('credentials as cd');
+                    $result->join('contracts as ct', 'ct.property_id', '=', 'cd.property_id');
+                    $result->select('cd.first_name', 'cd.last_name','cd.title',DB::raw('(select actor_status from esignature_actor where actor_mail = cd.email) as actor_status'));
+                    $result->where('cd.status', '=', '0');
+                    if ($cid != '') {
+                        $result->where('ct.unique_key', '=', $cid)
+                            ->where(function ($result) use ($contract_id) {
+                                $result->where('cd.contract_id', '=', $contract_id)
+                            ->orWhereNULL('cd.contract_id');
+                            });
+                    }
+                    $result = $result->get()->toArray();
+                    $i = 0;
+                    $j = 0;
+                    foreach ($result as $key => $value) {
+                        if($value->actor_status == "Available") {
+                            $pending_users[$i++] = $value;
+                        }
+                        else {
+                            $signed_users[$j++] = $value;
+                        }
+                    }
                     if ($esignature_info[0]->actor_status == "Available") {
                         $statusurl = env('ESIGNATURE')."packages/".$esignature_info[0]->package_id."/status";
                         $packagedata = $createCurlRequestObject->curlRequest($statusurl, env('ESIGNATURE_PASS'), "GET", null);
-                        // $statusurl = env('ESIGNATURE')."packages/".$esignature_info[0]->package_id."/status";
-                        // $packagedata = $creat$contarct_status[0]->status
-                        // CurlRequestObject->curlRequest($statusurl, env('ESIGNATURE_PASS'), "GET", null);
                         foreach ($packagedata['response']['Stakeholders'] as $key => $value) {
                             $externalReference = explode(",", $value['ExternalStakeholderReference']);
                             if ($externalReference[1] == $useremail && $externalReference[2] == $cid) {
@@ -160,13 +192,13 @@ class ValidateEsignaturePackage {
                                 }
                                 else {
                                     foreach ($signed_users as $key => $value) {
-                                        $signed = $signed.$value->fname;
+                                        $signed = $signed.$value->title.$value->first_name." ".$value->last_name;
                                         if($key < count($signed_users)-1) {
                                             $signed = $signed.", ";
                                         }
                                     }
                                     foreach ($pending_users as $key => $value) {
-                                        $pending = $pending.$value->fname;
+                                        $pending = $pending.$value->title.$value->first_name." ".$value->last_name;
                                         if($key < count($pending_users)-1) {
                                             $pending = $pending.", ";
                                         }
@@ -204,13 +236,13 @@ class ValidateEsignaturePackage {
                             }
                             else {
                                 foreach ($signed_users as $key => $value) {
-                                    $signed = $signed.$value->fname;
+                                    $signed = $signed.$value->title.$value->first_name." ".$value->last_name;
                                     if($key < count($signed_users)-1) {
                                         $signed = $signed.", ";
                                     }
                                 }
                                 foreach ($pending_users as $key => $value) {
-                                    $pending = $pending.$value->fname;
+                                    $pending = $pending.$value->title.$value->first_name." ".$value->last_name;
                                     if($key < count($pending_users)-1) {
                                         $pending = $pending.", ";
                                     }
@@ -233,21 +265,40 @@ class ValidateEsignaturePackage {
                 $packagestatus = "Finished";
             }
             else {
-                $signed_users = DB::table('esignature_actor as ea')->join('esignature_package as ep', 'ea.package_id', 'ep.package_id')->select('ea.fname')->where('ea.actor_status', "Available")->where('ep.contract_id', $cid)->get()->toarray();
-                $pending_users = DB::table('esignature_actor as ea')->join('esignature_package as ep', 'ea.package_id', 'ep.package_id')->select('ea.fname')->where('ea.actor_status', "SIGNED")->where('ep.contract_id', $cid)->get()->toarray();
-                
-                
+                $contract_id = DB::table('contracts')->where('unique_key', '=', $cid)->value('id');
+                    $result = DB::table('credentials as cd');
+                    $result->join('contracts as ct', 'ct.property_id', '=', 'cd.property_id');
+                    $result->select('cd.first_name', 'cd.last_name','cd.title',DB::raw('(select actor_status from esignature_actor where actor_mail = cd.email) as actor_status'));
+                    $result->where('cd.status', '=', '0');
+                    if ($cid != '') {
+                        $result->where('ct.unique_key', '=', $cid)
+                            ->where(function ($result) use ($contract_id) {
+                                $result->where('cd.contract_id', '=', $contract_id)
+                            ->orWhereNULL('cd.contract_id');
+                            });
+                    }
+                    $result = $result->get()->toArray();
+                    $i = 0;
+                    $j = 0;
+                    foreach ($result as $key => $value) {
+                        if($value->actor_status == "Available") {
+                            $pending_users[$i++] = $value;
+                        }
+                        else {
+                            $signed_users[$j++] = $value;
+                        }
+                    }
                 $sign_disable = "true";
                 $action_url = "";
                 $download_url = "download/unsigned-document/".$cid;
                 foreach ($signed_users as $key => $value) {
-                    $signed = $signed.$value->fname;
+                    $signed = $signed.$value->title.$value->first_name." ".$value->last_name;
                     if($key < count($signed_users)-1) {
                         $signed = $signed.", ";
                     }
                 }
                 foreach ($pending_users as $key => $value) {
-                    $pending = $pending.$value->fname;
+                    $pending = $pending.$value->title.$value->first_name." ".$value->last_name;
                     if($key < count($pending_users)-1) {
                         $pending = $pending.", ";
                     }
@@ -256,7 +307,6 @@ class ValidateEsignaturePackage {
             }
             
         }
-        //print_r([$sign_disable,$action_url,$download_url,$esignature_message,$sign_show,$signed,$pending,$actorstatus,$packagestatus]);exit;
         return [$sign_disable,$action_url,$download_url,$esignature_message,$sign_show,$signed,$pending,$actorstatus,$packagestatus];
     }
 }
