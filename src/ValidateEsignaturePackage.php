@@ -58,7 +58,7 @@ class ValidateEsignaturePackage {
                         $packagedata = $createCurlRequestObject->curlRequest($statusurl, env('ESIGNATURE_PASS'), "GET", null);
                         foreach ($packagedata['response']['Stakeholders'] as $key => $value) {
                             $externalReference = explode(",", $value['ExternalStakeholderReference']);
-                            if ($externalReference[1] == $useremail && $externalReference[2] == $cid) {
+                            if (base64_decode($externalReference[1]) == $useremail && $externalReference[2] == $cid) {
                                 $sign_disable = "false";
                                 $action_url = $value['Actors'][0]['ActionUrl'];
                                 if (isset($userid) && $userid != '') {
@@ -90,7 +90,7 @@ class ValidateEsignaturePackage {
                             $packagedata = $createCurlRequestObject->curlRequest($statusurl, env('ESIGNATURE_PASS'), "GET", null);
                             foreach ($packagedata['response']['Stakeholders'] as $key => $value) {
                                 $externalReference = explode(",", $value['ExternalStakeholderReference']);
-                                if ($externalReference[1] == $useremail && $externalReference[2] == $cid) {
+                                if (base64_decode($externalReference[1]) == $useremail && $externalReference[2] == $cid) {
                                     $action_url = $value['Actors'][0]['ActionUrl'];
                                     if (isset($userid) && $userid != '') {
                                         redirect()->to($action_url)->send();
@@ -158,7 +158,7 @@ class ValidateEsignaturePackage {
                         $packagedata = $createCurlRequestObject->curlRequest($statusurl, env('ESIGNATURE_PASS'), "GET", null);
                         foreach ($packagedata['response']['Stakeholders'] as $key => $value) {
                             $externalReference = explode(",", $value['ExternalStakeholderReference']);
-                            if ($externalReference[1] == $useremail && $externalReference[2] == $cid) {
+                            if (base64_decode($externalReference[1]) == $useremail && $externalReference[2] == $cid) {
                                 $sign_disable = "false";
                                 $action_url = $value['Actors'][0]['ActionUrl'];
                                 if (isset($userid) && $userid != '') {
@@ -190,7 +190,7 @@ class ValidateEsignaturePackage {
                             $packagedata = $createCurlRequestObject->curlRequest($statusurl, env('ESIGNATURE_PASS'), "GET", null);
                             foreach ($packagedata['response']['Stakeholders'] as $key => $value) {
                                 $externalReference = explode(",", $value['ExternalStakeholderReference']);
-                                if ($externalReference[1] == $useremail && $externalReference[2] == $cid) {
+                                if (base64_decode($externalReference[1]) == $useremail && $externalReference[2] == $cid) {
                                     $action_url = $value['Actors'][0]['ActionUrl'];
                                     if (isset($userid) && $userid != '') {
                                         redirect()->to($action_url)->send();
