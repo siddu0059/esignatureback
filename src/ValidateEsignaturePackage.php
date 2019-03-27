@@ -40,20 +40,9 @@ class ValidateEsignaturePackage {
                     }
                 } 
                 else {
+                    $users = DB::table('credentials as c')->join('esignature_actor as ea','c.id','ea.credentials_id')->join('esignature_package as ep','ep.package_id','ea.package_id')->select('c.first_name','c,last_name','c.title')->where('ep.contract_id',$cid);
                     $actorstatus = $esignature_info[0]->actor_status;
-                    $contract_id = DB::table('contracts')->where('unique_key', '=', $cid)->value('id');
-                    $result = DB::table('credentials as cd');
-                    $result->join('contracts as ct', 'ct.property_id', '=', 'cd.property_id');
-                    $result->select('cd.first_name', 'cd.last_name','cd.title',DB::raw('(select actor_status from esignature_actor where actor_mail = cd.email) as actor_status'));
-                    $result->where('cd.status', '=', '0');
-                    if ($cid != '') {
-                        $result->where('ct.unique_key', '=', $cid)
-                            ->where(function ($result) use ($contract_id) {
-                                $result->where('cd.contract_id', '=', $contract_id)
-                            ->orWhereNULL('cd.contract_id');
-                            });
-                    }
-                    $result = $result->get()->toArray();
+                    $result = DB::table('credentials as c')->join('esignature_actor as ea','c.id','ea.credentials_id')->join('esignature_package as ep','ep.package_id','ea.package_id')->select('c.first_name','c.last_name','c.title','ea.actor_status')->where('ep.contract_id',$cid)->get()->toArray();
                     $i = 0;
                     $j = 0;
                     foreach ($result as $key => $value) {
@@ -142,7 +131,7 @@ class ValidateEsignaturePackage {
                 return [$sign_disable,$action_url,$download_url,$esignature_message,$sign_show,$signed,$pending,$actorstatus,$packagestatus];
             }
             else {
-                if (empty($esignature_info )) {
+                if (empty($esignature_info)) {
                     $actorstatus = "Available";
                     $sign_disable = "false";
                     $action_url = "/sign-contract/$cid";
@@ -150,22 +139,10 @@ class ValidateEsignaturePackage {
                     if (isset($userid) && $userid != '') {
                         redirect()->to(env('APP_URL') . "/sign-contract/$cid?userrole=$userrole&email=$useremail&userid=$userid")->send();
                     }
-                } 
+                }
                 else {
                     $actorstatus = $esignature_info[0]->actor_status;
-                    $contract_id = DB::table('contracts')->where('unique_key', '=', $cid)->value('id');
-                    $result = DB::table('credentials as cd');
-                    $result->join('contracts as ct', 'ct.property_id', '=', 'cd.property_id');
-                    $result->select('cd.first_name', 'cd.last_name','cd.title',DB::raw('(select actor_status from esignature_actor where actor_mail = cd.email) as actor_status'));
-                    $result->where('cd.status', '=', '0');
-                    if ($cid != '') {
-                        $result->where('ct.unique_key', '=', $cid)
-                            ->where(function ($result) use ($contract_id) {
-                                $result->where('cd.contract_id', '=', $contract_id)
-                            ->orWhereNULL('cd.contract_id');
-                            });
-                    }
-                    $result = $result->get()->toArray();
+                    $result = DB::table('credentials as c')->join('esignature_actor as ea','c.id','ea.credentials_id')->join('esignature_package as ep','ep.package_id','ea.package_id')->select('c.first_name','c.last_name','c.title','ea.actor_status')->where('ep.contract_id',$cid)->get()->toArray();
                     $i = 0;
                     $j = 0;
                     foreach ($result as $key => $value) {
@@ -265,29 +242,17 @@ class ValidateEsignaturePackage {
                 $packagestatus = "Finished";
             }
             else {
-                $contract_id = DB::table('contracts')->where('unique_key', '=', $cid)->value('id');
-                    $result = DB::table('credentials as cd');
-                    $result->join('contracts as ct', 'ct.property_id', '=', 'cd.property_id');
-                    $result->select('cd.first_name', 'cd.last_name','cd.title',DB::raw('(select actor_status from esignature_actor where actor_mail = cd.email) as actor_status'));
-                    $result->where('cd.status', '=', '0');
-                    if ($cid != '') {
-                        $result->where('ct.unique_key', '=', $cid)
-                            ->where(function ($result) use ($contract_id) {
-                                $result->where('cd.contract_id', '=', $contract_id)
-                            ->orWhereNULL('cd.contract_id');
-                            });
+                $result = DB::table('credentials as c')->join('esignature_actor as ea','c.id','ea.credentials_id')->join('esignature_package as ep','ep.package_id','ea.package_id')->select('c.first_name','c.last_name','c.title','ea.actor_status')->where('ep.contract_id',$cid)->get()->toArray();
+                $i = 0;
+                $j = 0;
+                foreach ($result as $key => $value) {
+                    if($value->actor_status == "Available") {
+                        $pending_users[$i++] = $value;
                     }
-                    $result = $result->get()->toArray();
-                    $i = 0;
-                    $j = 0;
-                    foreach ($result as $key => $value) {
-                        if($value->actor_status == "Available") {
-                            $pending_users[$i++] = $value;
-                        }
-                        else {
-                            $signed_users[$j++] = $value;
-                        }
+                    else {
+                        $signed_users[$j++] = $value;
                     }
+                }
                 $sign_disable = "true";
                 $action_url = "";
                 $download_url = "download/unsigned-document/".$cid;
