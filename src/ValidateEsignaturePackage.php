@@ -69,13 +69,13 @@ class ValidateEsignaturePackage {
                                 }
                                 else {
                                     foreach ($signed_users as $key => $value) {
-                                        $signed = $signed.$value->title.$value->first_name." ".$value->last_name;
+                                        $signed = $signed.$value->title." ".$value->first_name." ".$value->last_name;
                                         if($key < count($signed_users)-1) {
                                             $signed = $signed.", ";
                                         }
                                     }
                                     foreach ($pending_users as $key => $value) {
-                                        $pending = $pending.$value->title.$value->first_name." ".$value->last_name;
+                                        $pending = $pending.$value->title." ".$value->first_name." ".$value->last_name;
                                         if($key < count($pending_users)-1) {
                                             $pending = $pending.", ";
                                         }
@@ -113,13 +113,13 @@ class ValidateEsignaturePackage {
                             }
                             else {
                                 foreach ($signed_users as $key => $value) {
-                                    $signed = $signed.$value->title.$value->first_name." ".$value->last_name;
+                                    $signed = $signed.$value->title." ".$value->first_name." ".$value->last_name;
                                     if($key < count($signed_users)-1) {
                                         $signed = $signed.", ";
                                     }
                                 }
                                 foreach ($pending_users as $key => $value) {
-                                    $pending = $pending.$value->title.$value->first_name." ".$value->last_name;
+                                    $pending = $pending.$value->title." ".$value->first_name." ".$value->last_name;
                                     if($key < count($pending_users)-1) {
                                         $pending = $pending.", ";
                                     }
@@ -169,13 +169,13 @@ class ValidateEsignaturePackage {
                                 }
                                 else {
                                     foreach ($signed_users as $key => $value) {
-                                        $signed = $signed.$value->title.$value->first_name." ".$value->last_name;
+                                        $signed = $signed.$value->title." ".$value->first_name." ".$value->last_name;
                                         if($key < count($signed_users)-1) {
                                             $signed = $signed.", ";
                                         }
                                     }
                                     foreach ($pending_users as $key => $value) {
-                                        $pending = $pending.$value->title.$value->first_name." ".$value->last_name;
+                                        $pending = $pending.$value->title." ".$value->first_name." ".$value->last_name;
                                         if($key < count($pending_users)-1) {
                                             $pending = $pending.", ";
                                         }
@@ -213,13 +213,13 @@ class ValidateEsignaturePackage {
                             }
                             else {
                                 foreach ($signed_users as $key => $value) {
-                                    $signed = $signed.$value->title.$value->first_name." ".$value->last_name;
+                                    $signed = $signed.$value->title." ".$value->first_name." ".$value->last_name;
                                     if($key < count($signed_users)-1) {
                                         $signed = $signed.", ";
                                     }
                                 }
                                 foreach ($pending_users as $key => $value) {
-                                    $pending = $pending.$value->title.$value->first_name." ".$value->last_name;
+                                    $pending = $pending.$value->title." ".$value->first_name." ".$value->last_name;
                                     if($key < count($pending_users)-1) {
                                         $pending = $pending.", ";
                                     }
@@ -257,13 +257,13 @@ class ValidateEsignaturePackage {
                 $action_url = "";
                 $download_url = "download/unsigned-document/".$cid;
                 foreach ($signed_users as $key => $value) {
-                    $signed = $signed.$value->title.$value->first_name." ".$value->last_name;
+                    $signed = $signed.$value->title." ".$value->first_name." ".$value->last_name;
                     if($key < count($signed_users)-1) {
                         $signed = $signed.", ";
                     }
                 }
                 foreach ($pending_users as $key => $value) {
-                    $pending = $pending.$value->title.$value->first_name." ".$value->last_name;
+                    $pending = $pending.$value->title." ".$value->first_name." ".$value->last_name;
                     if($key < count($pending_users)-1) {
                         $pending = $pending.", ";
                     }
