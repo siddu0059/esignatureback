@@ -19,8 +19,7 @@ class validateesignature {
         // if (isset($userid) && $userid != '') {
         //     echo "hellooo";exit;
         // }
-        $this ->contarct_status = DB::table('contracts as c')->join('status as s', 's.id', '=', 'c.status')->where('unique_key', $cid)->select('c.status', 's.name')->get()->toarray();
-        
+        $this ->contarct_status = DB::table('contracts as c')->join('status as s', 's.id', '=', 'c.status')->where('unique_key', $cid)->select('c.status', 's.name')->get()->toarray(); 
         if ($userrole == "tenant") {
             if($this ->contarct_status[0]->status == 3 || $this ->contarct_status[0]->status == 9 || $this ->contarct_status[0]->status == 13) {
                 self::getvalues($cid,$userrole,$useremail);
@@ -50,7 +49,7 @@ class validateesignature {
     }
 
     public function getvalues($cid,$userrole,$useremail) {
-        $esignature_pacakge_info = DB::table('esignature_package')->select('package_id')->where('contract_id', $cid)->get()->toarray();
+        $esignature_pacakge_info = DB::table('esignature_package')->select('package_id', 'document_id')->where('contract_id', $cid)->get()->toarray();
         if(count($esignature_pacakge_info) == 0) {
             $this ->sign_disable = "false";
             $this ->sign_show = "true";
@@ -63,7 +62,7 @@ class validateesignature {
         elseif($this ->contarct_status[0]->status == 13) {
             $this ->sign_disable = "true";
             $this ->sign_show = "false";
-            $this ->download_url = $download_url = "/download/signed-document/".$esignature_info[0]->package_id."/".$esignature_info[0]->document_id."/".$cid;
+            $this ->download_url = $download_url = "/download/signed-document/".$esignature_pacakge_info[0]->package_id."/".$esignature_pacakge_info[0]->document_id."/".$cid;
             $this ->sign_show = "false";
             $this ->esignature_message = "Signed by all parties";
             $this ->actorstatus = "SIGNED";
