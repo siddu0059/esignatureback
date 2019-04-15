@@ -139,7 +139,7 @@ class validateesignature {
         }
     }
 
-
+    /*
     public function getApiUrl($esignature_info,$useremail,$cid) {
         if(count($esignature_info) == 0) {
             $action_url = "/sign-contract/$cid";
@@ -168,6 +168,51 @@ class validateesignature {
                     echo "time out";
                 }
                 return "timeout";
+            }
+        }
+            
+    } */
+    public function getApiUrl($esignature_info,$useremail,$cid) {
+        $response = ['success' => 0, 'url' => '', 'message' => '', 'type' => 1];
+        if(count($esignature_info) == 0) {
+            // $action_url = "/get-connective-sign-url/$cid";
+            // return $action_url;
+            $action_url = "/get-connective-sign-url/$cid";
+            $response['url'] = $action_url;
+            $response['success'] = 1;
+            return $response;
+        }
+        else {
+            $statusurl = env('ESIGNATURE')."packages/".$esignature_info[0]->package_id."/status";
+            $createCurlRequestObject = new CreateCurlRequest();
+            $packagedata = $createCurlRequestObject->curlRequest($statusurl, env('ESIGNATURE_PASS'), "GET", null);
+            if(isset($packagedata['response']['Stakeholders'])) {
+                foreach ($packagedata['response']['Stakeholders'] as $key => $value) {
+                    $externalReference = explode(",", $value['ExternalStakeholderReference']);
+                    if (base64_decode($externalReference[1]) == $useremail && $externalReference[2] == $cid) {
+                        $action_url = $value['Actors'][0]['ActionUrl'];
+                        /*if (isset($userid) && $userid != '') {
+                            redirect()->to($action_url)->send();
+                        }
+                        else {
+                            return $action_url;
+                        }*/
+                        $response['url'] = $action_url;
+                        $response['success'] = 1;
+                        $response['type'] = 2;
+                        return $response;
+                    }
+                }
+            }
+            else {
+                $response['success'] = 0;
+                $response['message'] = t('Unable to receive response from connective server, please try again');
+                return $response;
+                /*if (isset($userid) && $userid != '') {
+                    echo "time out";
+                }
+                return "timeout";
+                */
             }
         }
             
