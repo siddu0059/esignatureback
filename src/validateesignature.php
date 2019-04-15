@@ -15,11 +15,8 @@ class validateesignature {
     private $actorstatus = "";
     private $packagestatus = "";
     public function proceedSignature($cid,$userrole,$useremail,$userid = '') {
-        // echo "sdfghjk";exit;
-        // if (isset($userid) && $userid != '') {
-        //     echo "hellooo";exit;
-        // }
-        $this ->contarct_status = DB::table('contracts as c')->join('status as s', 's.id', '=', 'c.status')->where('unique_key', $cid)->select('c.status', 's.name')->get()->toarray(); 
+    $this ->contarct_status = DB::table('contracts as c')->join('status as s', 's.id', '=', 'c.status')->where('unique_key', $cid)->select('c.status', 's.name')->get()->toarray();
+        
         if ($userrole == "tenant") {
             if($this ->contarct_status[0]->status == 3 || $this ->contarct_status[0]->status == 9 || $this ->contarct_status[0]->status == 13) {
                 self::getvalues($cid,$userrole,$useremail);
@@ -49,8 +46,8 @@ class validateesignature {
     }
 
     public function getvalues($cid,$userrole,$useremail) {
-        $esignature_pacakge_info = DB::table('esignature_package')->select('package_id', 'document_id')->where('contract_id', $cid)->get()->toarray();
-        if(count($esignature_pacakge_info) == 0) {
+        $esignature_package_info = DB::table('esignature_package')->select('package_id','package_status')->where('contract_id', $cid)->get()->toarray();
+        if(count($esignature_package_info) == 0) {
             $this ->sign_disable = "false";
             $this ->sign_show = "true";
             $this ->action_url = "";
@@ -59,7 +56,7 @@ class validateesignature {
             $this ->actorstatus = "Available";
             $this ->packagestatus = "Pending";
         }
-        elseif($this ->contarct_status[0]->status == 13) {
+        elseif($this ->contarct_status[0]->status == 13 || $esignature_package_info[0]->package_status == 'Finished') {
             $esignature_info = DB::table('esignature_actor as ea')->join('esignature_package as ep', 'ea.package_id', 'ep.package_id')->select('ea.actor_role', 'ea.actor_status', 'ep.package_id', 'ep.document_id', 'ep.download_url', 'ep.contract_id', 'ep.package_status')->where('ea.actor_mail', $useremail)->where('ep.contract_id', $cid)->get()->toarray();
             $this ->sign_disable = "true";
             $this ->sign_show = "false";
