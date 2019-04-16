@@ -139,8 +139,7 @@ class validateesignature {
         }
     }
 
-    /*
-    public function getApiUrl($esignature_info,$useremail,$cid) {
+    /*public function getApiUrl($esignature_info,$useremail,$cid) {
         $response = ['success' => 0, 'url' => '', 'message' => '', 'type' => 1];
         if(count($esignature_info) == 0) {
             // $action_url = "/get-connective-sign-url/$cid";
@@ -159,12 +158,12 @@ class validateesignature {
                     $externalReference = explode(",", $value['ExternalStakeholderReference']);
                     if (base64_decode($externalReference[1]) == $useremail && $externalReference[2] == $cid) {
                         $action_url = $value['Actors'][0]['ActionUrl'];
-                        /*if (isset($userid) && $userid != '') {
+                        if (isset($userid) && $userid != '') {
                             redirect()->to($action_url)->send();
                         }
                         else {
                             return $action_url;
-                        }*/
+                        }
                         $response['url'] = $action_url;
                         $response['success'] = 1;
                         $response['type'] = 2;
