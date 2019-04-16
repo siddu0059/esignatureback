@@ -159,12 +159,12 @@ class validateesignature {
                     $externalReference = explode(",", $value['ExternalStakeholderReference']);
                     if (base64_decode($externalReference[1]) == $useremail && $externalReference[2] == $cid) {
                         $action_url = $value['Actors'][0]['ActionUrl'];
-                        /*if (isset($userid) && $userid != '') {
+                        if (isset($userid) && $userid != '') {
                             redirect()->to($action_url)->send();
                         }
                         else {
                             return $action_url;
-                        }*/
+                        }
                         $response['url'] = $action_url;
                         $response['success'] = 1;
                         $response['type'] = 2;
