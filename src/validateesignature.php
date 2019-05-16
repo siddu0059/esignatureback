@@ -50,7 +50,7 @@ class validateesignature {
     public function getvalues($cid,$userrole,$useremail) {
         $valid_user = false;
         $esignature_package_info = DB::table('esignature_package')->select('package_id','package_status','document_id')->where('contract_id', $cid)->get()->toarray();
-        $esignature_info = DB::table('esignature_actor as ea')->join('esignature_package as ep', 'ea.package_id', 'ep.package_id')->select('ea.actor_role', 'ea.actor_status', 'ep.package_id', 'ep.document_id', 'ep.download_url', 'ep.contract_id', 'ep.package_status')->where('ea.actor_mail', $useremail)->where('ep.contract_id', $cid)->get()->toarray();        
+        $esignature_info = DB::table('esignature_actor as ea')->join('esignature_package as ep', 'ea.package_id', 'ep.package_id')->select('ea.actor_role', 'ea.actor_status', 'ep.package_id', 'ep.document_id', 'ep.download_url', 'ep.contract_id', 'ep.package_status')->where('ea.actor_mail', $useremail)->where('ep.contract_id', $cid)->get()->toarray();
         $contract_id = DB::table('contracts')->where('unique_key', '=', $cid)->value('id');
         $result = DB::table('credentials as cd');
         $result->join('contracts as ct', 'cd.property_id', '=', 'ct.property_id');
@@ -81,7 +81,7 @@ class validateesignature {
                 $this ->packagestatus = "";
             }
             else {
-                $actorstatus = $esignature_info[0]->actor_status;
+                
                 if($actorstatus == "Available") {
                     $users = self::eSignatureUsers($cid);
                     $this ->sign_disable = "false";
@@ -116,6 +116,30 @@ class validateesignature {
                 $this ->esignature_message = "Signature is pending from all the parties";
                 $this ->actorstatus = "Available";
                 $this ->packagestatus = "Pending";
+        }
+        elseif($esignature_info[0]->actor_status == "Available") {
+            $users = self::eSignatureUsers($cid);
+            $this ->sign_disable = "false";
+            $this ->sign_show = "true";
+            $this ->action_url = "";
+            $this ->signed = $users['signed'];
+            $this ->pending = $users['pending'];
+            $this ->esignature_message = $users['esignature_message'];
+            $this ->download_url = "/download/unsigned-document/".$cid;
+            $this ->actorstatus = "Available";
+            $this ->packagestatus = "Pending";
+
+        }
+        elseif($esignature_info[0]->actor_status == "SIGNED") {
+            $users = self::eSignatureUsers($cid);
+            $this ->sign_disable = "true";
+            $this ->sign_show = "false";
+            $this ->signed = $users['signed'];
+            $this ->pending = $users['pending'];
+            $this ->esignature_message = $users['esignature_message'];
+            $this ->download_url = "/download/unsigned-document/".$cid;
+            $this ->actorstatus = "SIGNED";
+            $this ->packagestatus = "Pending";
         }
         elseif(($this->contract_status[0]->status == 13 || $esignature_package_info[0]->package_status == 'Finished') && $valid_user == true) {
             $this ->sign_disable = "true";
