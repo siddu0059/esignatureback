@@ -26,7 +26,7 @@ class validateesignature {
             }
         } 
         else if($userrole == "property owner"){
-            if($contract_status[0]->status == 2 || $contract_status[0]->status == 3 || $contract_status[0]->status == 9 || $contract_status[0]->status == 7) {
+            if($contract_status[0]->status == 2 || $contract_status[0]->status == 3 || $contract_status[0]->status == 9 || $contract_status[0]->status == 7 || $contract_status[0]->status == 13) {
                 self::getvalues($cid,$userrole,$useremail);
             }
             else {
@@ -70,6 +70,7 @@ class validateesignature {
                 break;
             }
         }
+       
         if( $valid_user == false) {
             if(count($esignature_package_info) == 0 || count($esignature_info) == 0) {
                 $this ->sign_disable = "true";
@@ -81,8 +82,16 @@ class validateesignature {
                 $this ->packagestatus = "";
             }
             else {
-                
-                if($actorstatus == "Available") {
+                if($this->contract_status[0]->status == 13 || $esignature_package_info[0]->package_status == 'Finished') {
+                    $this ->sign_disable = "true";
+                    $this ->sign_show = "false";
+                    $this ->download_url = $download_url = "/download/signed-document/".$esignature_package_info[0]->package_id."/".$esignature_package_info[0]->document_id."/".$cid;
+                    $this ->sign_show = "false";
+                    $this ->esignature_message = "Signed by all parties";
+                    $this ->actorstatus = "SIGNED";
+                    $this ->packagestatus = "Finished";
+                }
+                elseif($actorstatus == "Available") {
                     $users = self::eSignatureUsers($cid);
                     $this ->sign_disable = "false";
                     $this ->sign_show = "true";
@@ -141,7 +150,7 @@ class validateesignature {
             $this ->actorstatus = "SIGNED";
             $this ->packagestatus = "Pending";
         }
-        elseif(($this->contract_status[0]->status == 13 || $esignature_package_info[0]->package_status == 'Finished') && $valid_user == true) {
+        if((count($esignature_package_info) != 0 && count($esignature_info) != 0) && ($this->contract_status[0]->status == 13 || $esignature_package_info[0]->package_status == 'Finished')) {
             $this ->sign_disable = "true";
             $this ->sign_show = "false";
             $this ->download_url = $download_url = "/download/signed-document/".$esignature_package_info[0]->package_id."/".$esignature_package_info[0]->document_id."/".$cid;
@@ -150,7 +159,6 @@ class validateesignature {
             $this ->actorstatus = "SIGNED";
             $this ->packagestatus = "Finished";
         }
-        
     } 
     
     public function cantSign($cid) {
