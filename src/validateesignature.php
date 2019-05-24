@@ -18,7 +18,7 @@ class validateesignature {
         $contract_status = DB::table('contracts')->where('unique_key', $cid)->select('status')->get()->toarray();
         $this->contract_status = $contract_status;
         if ($userrole == "tenant") {
-            if($this ->contract_status[0]->status == 9) {
+            if($this ->contract_status[0]->status == 9 || $contract_status[0]->status == 7 || $contract_status[0]->status == 13) {
                 self::getvalues($cid,$userrole,$useremail);
             }
             else {
