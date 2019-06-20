@@ -18,7 +18,7 @@ class validateesignature {
         $contract_status = DB::table('contracts')->where('unique_key', $cid)->select('status')->get()->toarray();
         $this->contract_status = $contract_status;
         if ($userrole == "tenant") {
-            if($this ->contract_status[0]->status == 9 || $contract_status[0]->status == 7 || $contract_status[0]->status == 13) {
+            if($this ->contract_status[0]->status == 9 || $contract_status[0]->status == 7 || $contract_status[0]->status == 13 || $contract_status[0]->status == 6) {
                 self::getvalues($cid,$userrole,$useremail);
             }
             else {
@@ -26,7 +26,7 @@ class validateesignature {
             }
         } 
         else if($userrole == "property owner"){
-            if($contract_status[0]->status == 2 || $contract_status[0]->status == 3 || $contract_status[0]->status == 9 || $contract_status[0]->status == 7 || $contract_status[0]->status == 13) {
+            if($contract_status[0]->status == 2 || $contract_status[0]->status == 3 || $contract_status[0]->status == 9 || $contract_status[0]->status == 7 || $contract_status[0]->status == 13 || $contract_status[0]->status == 6) {
                 self::getvalues($cid,$userrole,$useremail);
             }
             else {
@@ -34,7 +34,7 @@ class validateesignature {
             }
         }
         else {
-            if($contract_status[0]->status == 2 || $contract_status[0]->status == 9) {
+            if($contract_status[0]->status == 2 || $contract_status[0]->status == 9 || $contract_status[0]->status == 6) {
                 self::getvalues($cid,$userrole,$useremail);
                 $this ->sign_disable = "true";
                 $this ->sign_show = "false";
@@ -82,7 +82,7 @@ class validateesignature {
                 $this ->packagestatus = "";
             }
             else {
-                if($this->contract_status[0]->status == 13 || $esignature_package_info[0]->package_status == 'Finished') {
+                if($this->contract_status[0]->status == 13 || $this->contract_status[0]->status == 6 || $esignature_package_info[0]->package_status == 'Finished') {
                     $this ->sign_disable = "true";
                     $this ->sign_show = "false";
                     $this ->download_url = $download_url = "/download/signed-document/".$esignature_package_info[0]->package_id."/".$esignature_package_info[0]->document_id."/".$cid;
@@ -150,7 +150,7 @@ class validateesignature {
             $this ->actorstatus = "SIGNED";
             $this ->packagestatus = "Pending";
         }
-        if((count($esignature_package_info) != 0 && count($esignature_info) != 0) && ($this->contract_status[0]->status == 13 || $esignature_package_info[0]->package_status == 'Finished')) {
+        if((count($esignature_package_info) != 0 && count($esignature_info) != 0) && (($this->contract_status[0]->status == 13 || $this->contract_status[0]->status == 6) && $esignature_package_info[0]->package_status == 'Finished')) {
             $this ->sign_disable = "true";
             $this ->sign_show = "false";
             $this ->download_url = $download_url = "/download/signed-document/".$esignature_package_info[0]->package_id."/".$esignature_package_info[0]->document_id."/".$cid;
