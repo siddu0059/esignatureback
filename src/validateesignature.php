@@ -100,7 +100,7 @@ class validateesignature {
                     $this ->actorstatus = "SIGNED";
                     $this ->packagestatus = "Finished";
                 }
-                elseif($this->contract_status[0]->status == 6 && $esignature_package_info[0]->package_status == 'Pending' && $actorstatus == "SIGNED") {
+                elseif($this->contract_status[0]->status == 6 && $esignature_package_info[0]->package_status == 'Pending' && $esignature_info[0]->actor_status == "SIGNED") {
                     $this ->sign_disable = "true";
                     $this ->sign_show = "false";
                     $this ->download_url = $download_url = "/download/unsigned-document/".$esignature_package_info[0]->package_id."/".$esignature_package_info[0]->document_id."/".$cid;
@@ -109,7 +109,7 @@ class validateesignature {
                     $this ->actorstatus = "SIGNED";
                     $this ->packagestatus = "Pending";
                 }
-                elseif($this->contract_status[0]->status == 6 && $actorstatus == "Available") {
+                elseif($this->contract_status[0]->status == 6 && $esignature_info[0]->actor_status == "Available") {
                     $this ->sign_disable = "true";
                     $this ->sign_show = "false";
                     $this ->download_url = $download_url = "/download/unsigned-document/".$esignature_package_info[0]->package_id."/".$esignature_package_info[0]->document_id."/".$cid;
@@ -118,7 +118,7 @@ class validateesignature {
                     $this ->actorstatus = "Available";
                     $this ->packagestatus = "Pending";
                 }
-                elseif($this->contract_status[0]->status != 6 && $actorstatus == "Available") {
+                elseif($this->contract_status[0]->status != 6 && $esignature_info[0]->actor_status == "Available") {
                     $users = self::eSignatureUsers($cid);
                     $this ->sign_disable = "false";
                     $this ->sign_show = "true";
@@ -153,7 +153,7 @@ class validateesignature {
                 $this ->actorstatus = "Available";
                 $this ->packagestatus = "Pending";
         }
-        elseif($this->contract_status[0]->status == 6 && $esignature_package_info[0]->package_status == 'Finished') {
+        elseif($this->contract_status[0]->status == 6 ) {
             $this ->sign_disable = "true";
             $this ->sign_show = "false";
             $this ->download_url = $download_url = "/download/signed-document/".$esignature_package_info[0]->package_id."/".$esignature_package_info[0]->document_id."/".$cid;
@@ -161,24 +161,6 @@ class validateesignature {
             $this ->esignature_message = "Cancelled";
             $this ->actorstatus = "SIGNED";
             $this ->packagestatus = "Finished";
-        }
-        elseif($this->contract_status[0]->status == 6 && $esignature_package_info[0]->package_status == 'Pending' && $actorstatus == "SIGNED") {
-            $this ->sign_disable = "true";
-            $this ->sign_show = "false";
-            $this ->download_url = $download_url = "/download/unsigned-document/".$esignature_package_info[0]->package_id."/".$esignature_package_info[0]->document_id."/".$cid;
-            $this ->sign_show = "false";
-            $this ->esignature_message = "Cancelled";
-            $this ->actorstatus = "SIGNED";
-            $this ->packagestatus = "Pending";
-        }
-        elseif($this->contract_status[0]->status == 6 && $actorstatus == "Available") {
-            $this ->sign_disable = "true";
-            $this ->sign_show = "false";
-            $this ->download_url = $download_url = "/download/unsigned-document/".$esignature_package_info[0]->package_id."/".$esignature_package_info[0]->document_id."/".$cid;
-            $this ->sign_show = "false";
-            $this ->esignature_message = "Cancelled";
-            $this ->actorstatus = "Available";
-            $this ->packagestatus = "Pending";
         }
         elseif($esignature_info[0]->actor_status == "Available") {
             $users = self::eSignatureUsers($cid);
