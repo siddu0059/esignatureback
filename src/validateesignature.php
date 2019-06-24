@@ -43,6 +43,7 @@ class validateesignature {
                 self::cantSign($cid);
             }
         }
+        // print_r([$this ->sign_disable,$this ->action_url,$this ->download_url,$this ->esignature_message,$this ->sign_show,$this ->signed,$this ->pending,$this ->actorstatus,$this ->packagestatus]);exit;
         return [$this ->sign_disable,$this ->action_url,$this ->download_url,$this ->esignature_message,$this ->sign_show,$this ->signed,$this ->pending,$this ->actorstatus,$this ->packagestatus];
 
     }
@@ -70,14 +71,22 @@ class validateesignature {
                 break;
             }
         }
-       
-        if( $valid_user == false) {
-            if(count($esignature_package_info) == 0 || count($esignature_info) == 0) {
+        if( $valid_user == false) { 
+            if((count($esignature_package_info) == 0) && $this->contract_status[0]->status != 6) {
                 $this ->sign_disable = "true";
                 $this ->sign_show = "false";
                 $this ->action_url = "";
                 $this ->download_url = "/download/unsigned-document/".$cid;
                 $this ->esignature_message = "Signature is pending from all the parties";
+                $this ->actorstatus = "";
+                $this ->packagestatus = "";
+            }
+            elseif((count($esignature_package_info) == 0) && $this->contract_status[0]->status != 6) {
+                $this ->sign_disable = "true";
+                $this ->sign_show = "false";
+                $this ->action_url = "";
+                $this ->download_url = "/download/unsigned-document/".$cid;
+                $this ->esignature_message = "Cancelled";
                 $this ->actorstatus = "";
                 $this ->packagestatus = "";
             }
@@ -100,19 +109,21 @@ class validateesignature {
                     $this ->actorstatus = "SIGNED";
                     $this ->packagestatus = "Finished";
                 }
-                elseif($this->contract_status[0]->status == 6 && $esignature_package_info[0]->package_status == 'Pending' && $esignature_info[0]->actor_status == "SIGNED") {
+                elseif($this->contract_status[0]->status == 6 && $esignature_package_info[0]->package_status == 'Pending') {
+                    $users = self::eSignatureUsers($cid);
                     $this ->sign_disable = "true";
                     $this ->sign_show = "false";
-                    $this ->download_url = $download_url = "/download/unsigned-document/".$esignature_package_info[0]->package_id."/".$esignature_package_info[0]->document_id."/".$cid;
+                    $this ->download_url = "/download/unsigned-document/".$cid;
                     $this ->sign_show = "false";
                     $this ->esignature_message = "Cancelled";
                     $this ->actorstatus = "SIGNED";
                     $this ->packagestatus = "Pending";
                 }
                 elseif($this->contract_status[0]->status == 6 && $esignature_info[0]->actor_status == "Available") {
+                    $users = self::eSignatureUsers($cid);
                     $this ->sign_disable = "true";
                     $this ->sign_show = "false";
-                    $this ->download_url = $download_url = "/download/unsigned-document/".$esignature_package_info[0]->package_id."/".$esignature_package_info[0]->document_id."/".$cid;
+                    $this ->download_url = "/download/unsigned-document/".$cid;
                     $this ->sign_show = "false";
                     $this ->esignature_message = "Cancelled";
                     $this ->actorstatus = "Available";
@@ -145,15 +156,24 @@ class validateesignature {
             }
         }
         elseif((count($esignature_package_info) == 0 || count($esignature_info) == 0) && $this->contract_status[0]->status != 6) {
-                $this ->sign_disable = "false";
-                $this ->sign_show = "true";
-                $this ->action_url = "";
-                $this ->download_url = "/download/unsigned-document/".$cid;
-                $this ->esignature_message = "Signature is pending from all the parties";
-                $this ->actorstatus = "Available";
-                $this ->packagestatus = "Pending";
+            $this ->sign_disable = "false";
+            $this ->sign_show = "true";
+            $this ->action_url = "";
+            $this ->download_url = "/download/unsigned-document/".$cid;
+            $this ->esignature_message = "Signature is pending from all the parties";
+            $this ->actorstatus = "Available";
+            $this ->packagestatus = "Pending";
         }
-        elseif($this->contract_status[0]->status == 6 ) {
+        elseif((count($esignature_package_info) == 0 || count($esignature_info) == 0) && $this->contract_status[0]->status == 6) {
+            $this ->sign_disable = "true";
+            $this ->sign_show = "false";
+            $this ->download_url = "/download/unsigned-document/".$cid;
+            $this ->sign_show = "false";
+            $this ->esignature_message = "Cancelled";
+            $this ->actorstatus = "Available";
+            $this ->packagestatus = "Pending";
+        }
+        elseif($this->contract_status[0]->status == 6 && $esignature_package_info[0]->package_status == 'Finished') {
             $this ->sign_disable = "true";
             $this ->sign_show = "false";
             $this ->download_url = $download_url = "/download/signed-document/".$esignature_package_info[0]->package_id."/".$esignature_package_info[0]->document_id."/".$cid;
@@ -161,6 +181,15 @@ class validateesignature {
             $this ->esignature_message = "Cancelled";
             $this ->actorstatus = "SIGNED";
             $this ->packagestatus = "Finished";
+        }
+        elseif($this->contract_status[0]->status == 6 && $esignature_package_info[0]->package_status != 'Finished') {
+            $this ->sign_disable = "true";
+            $this ->sign_show = "false";
+            $this ->download_url = "/download/unsigned-document/".$cid;
+            $this ->sign_show = "false";
+            $this ->esignature_message = "Cancelled";
+            $this ->actorstatus = "";
+            $this ->packagestatus = "Pending";
         }
         elseif($esignature_info[0]->actor_status == "Available") {
             $users = self::eSignatureUsers($cid);
