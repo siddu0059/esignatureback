@@ -36,6 +36,7 @@ class validateesignature {
         else {
             if($contract_status[0]->status == 2 || $contract_status[0]->status == 9 || $contract_status[0]->status == 6) {
                 self::getvalues($cid,$userrole,$useremail);
+                
                 $this ->sign_disable = "true";
                 $this ->sign_show = "false";
             }
@@ -72,16 +73,8 @@ class validateesignature {
             }
         }
         if( $valid_user == false) { 
-            if((count($esignature_package_info) == 0) && $this->contract_status[0]->status != 6) {
-                $this ->sign_disable = "true";
-                $this ->sign_show = "false";
-                $this ->action_url = "";
-                $this ->download_url = "/download/unsigned-document/".$cid;
-                $this ->esignature_message = "Signature is pending from all the parties";
-                $this ->actorstatus = "";
-                $this ->packagestatus = "";
-            }
-            elseif((count($esignature_package_info) == 0) && $this->contract_status[0]->status != 6) {
+            if((count($esignature_package_info) == 0) && $this->contract_status[0]->status == 6) {
+                
                 $this ->sign_disable = "true";
                 $this ->sign_show = "false";
                 $this ->action_url = "";
@@ -90,8 +83,19 @@ class validateesignature {
                 $this ->actorstatus = "";
                 $this ->packagestatus = "";
             }
+            elseif((count($esignature_package_info) == 0) && $this->contract_status[0]->status != 6) {
+                
+                $this ->sign_disable = "false";
+                $this ->sign_show = "true";
+                $this ->action_url = "";
+                $this ->download_url = "/download/unsigned-document/".$cid;
+                $this ->esignature_message = "Signature is pending from all the parties";
+                $this ->actorstatus = "";
+                $this ->packagestatus = "";
+            }
             else {
                 if($this->contract_status[0]->status == 13 && $esignature_package_info[0]->package_status == 'Finished') {
+                    
                     $this ->sign_disable = "true";
                     $this ->sign_show = "false";
                     $this ->download_url = $download_url = "/download/signed-document/".$esignature_package_info[0]->package_id."/".$esignature_package_info[0]->document_id."/".$cid;
@@ -101,16 +105,18 @@ class validateesignature {
                     $this ->packagestatus = "Finished";
                 }
                 elseif($this->contract_status[0]->status == 6 && $esignature_package_info[0]->package_status == 'Finished') {
+                    
                     $this ->sign_disable = "true";
                     $this ->sign_show = "false";
                     $this ->download_url = $download_url = "/download/signed-document/".$esignature_package_info[0]->package_id."/".$esignature_package_info[0]->document_id."/".$cid;
                     $this ->sign_show = "false";
-                    $this ->esignature_message = "Cancelled";
+                    $this ->esignature_message = "";
                     $this ->actorstatus = "SIGNED";
                     $this ->packagestatus = "Finished";
                 }
                 elseif($this->contract_status[0]->status == 6 && $esignature_package_info[0]->package_status == 'Pending') {
                     $users = self::eSignatureUsers($cid);
+                    
                     $this ->sign_disable = "true";
                     $this ->sign_show = "false";
                     $this ->download_url = "/download/unsigned-document/".$cid;
@@ -121,6 +127,7 @@ class validateesignature {
                 }
                 elseif($this->contract_status[0]->status == 6 && $esignature_info[0]->actor_status == "Available") {
                     $users = self::eSignatureUsers($cid);
+                    
                     $this ->sign_disable = "true";
                     $this ->sign_show = "false";
                     $this ->download_url = "/download/unsigned-document/".$cid;
@@ -144,6 +151,7 @@ class validateesignature {
                 }
                 else {
                     $users = self::eSignatureUsers($cid);
+                    
                     $this ->sign_disable = "true";
                     $this ->sign_show = "false";
                     $this ->signed = $users['signed'];
@@ -174,6 +182,7 @@ class validateesignature {
             $this ->packagestatus = "Pending";
         }
         elseif($this->contract_status[0]->status == 6 && $esignature_package_info[0]->package_status == 'Finished') {
+            
             $this ->sign_disable = "true";
             $this ->sign_show = "false";
             $this ->download_url = $download_url = "/download/signed-document/".$esignature_package_info[0]->package_id."/".$esignature_package_info[0]->document_id."/".$cid;
@@ -183,6 +192,7 @@ class validateesignature {
             $this ->packagestatus = "Finished";
         }
         elseif($this->contract_status[0]->status == 6 && $esignature_package_info[0]->package_status != 'Finished') {
+            
             $this ->sign_disable = "true";
             $this ->sign_show = "false";
             $this ->download_url = "/download/unsigned-document/".$cid;
@@ -205,6 +215,7 @@ class validateesignature {
 
         }
         elseif($esignature_info[0]->actor_status == "SIGNED") {
+            
             $users = self::eSignatureUsers($cid);
             $this ->sign_disable = "true";
             $this ->sign_show = "false";
@@ -216,6 +227,7 @@ class validateesignature {
             $this ->packagestatus = "Pending";
         }
         if((count($esignature_package_info) != 0 && count($esignature_info) != 0) && (($this->contract_status[0]->status == 13 || $this->contract_status[0]->status == 6) && $esignature_package_info[0]->package_status == 'Finished')) {
+            
             $this ->sign_disable = "true";
             $this ->sign_show = "false";
             $this ->download_url = $download_url = "/download/signed-document/".$esignature_package_info[0]->package_id."/".$esignature_package_info[0]->document_id."/".$cid;
@@ -227,6 +239,7 @@ class validateesignature {
     } 
     
     public function cantSign($cid) {
+        
         $this ->sign_disable = "true";
         $this ->sign_show = "false";
         $this ->download_url = "/download/unsigned-document/".$cid;
