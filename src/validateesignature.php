@@ -137,7 +137,7 @@ class validateesignature {
                     $this ->actorstatus = "SIGNED";
                     $this ->packagestatus = "Pending";
                 }
-                elseif($this->contract_status[0]->status == 6 && $esignature_info[0]->actor_status == "Available") {
+                elseif($this->contract_status[0]->status == 6 && count($esignature_info)> 0 && $esignature_info[0]->actor_status == "Available") {
                     $users = self::eSignatureUsers($cid);
                     
                     $this ->sign_disable = "true";
@@ -148,7 +148,7 @@ class validateesignature {
                     $this ->actorstatus = "Available";
                     $this ->packagestatus = "Pending";
                 }
-                elseif($this->contract_status[0]->status != 6 && $esignature_info[0]->actor_status == "Available") {
+                elseif($this->contract_status[0]->status != 6 && count($esignature_info)> 0 && $esignature_info[0]->actor_status == "Available") {
                     $users = self::eSignatureUsers($cid);
                     $this ->sign_disable = "false";
                     $this ->sign_show = "true";
@@ -326,6 +326,7 @@ class validateesignature {
         }
     }
     public function getApiUrl($esignature_info,$useremail,$cid) {
+        
         $response = ['success' => 0, 'url' => '', 'message' => '', 'type' => 1];
         if(count($esignature_info) == 0) {
             $action_url = "/get-connective-sign-url/$cid";
@@ -334,6 +335,7 @@ class validateesignature {
             return $response;
         }
         else {
+            
             $statusurl = env('ESIGNATURE')."packages/".$esignature_info[0]->package_id."/status";
             $createCurlRequestObject = new CreateCurlRequest();
             $packagedata = $createCurlRequestObject->curlRequest($statusurl, env('ESIGNATURE_PASS'), "GET", null);
@@ -341,6 +343,9 @@ class validateesignature {
                 foreach ($packagedata['response']['Stakeholders'] as $key => $value) {
                     $externalReference = explode(",", $value['ExternalStakeholderReference']);
                     if (base64_decode($externalReference[1]) == $useremail && $externalReference[2] == $cid) {
+                        if($value['Actors'][0]['ActorStatus'] == 'Finished') {
+                            DB::table('esignature_actor')->where('actor_id',$value['Actors'][0]['ActorId'])->update(['actor_status'=>'SIGNED']);
+                        }
                         $action_url = $value['Actors'][0]['ActionUrl'];
                         $response['url'] = $action_url;
                         $response['success'] = 1;
@@ -348,6 +353,7 @@ class validateesignature {
                         return $response;
                     }
                 }
+                exit;
             }
             else {
                 $response['success'] = 0;
